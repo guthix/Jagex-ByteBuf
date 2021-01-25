@@ -13,4 +13,6 @@ pluginManagement {
     }
 }
 
+include("jagbuf")
+
 rootProject.name = "jagex-bytebuf"

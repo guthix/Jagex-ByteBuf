@@ -21,17 +21,27 @@ val nettyVersion: String by extra("4.1.56.Final")
 val kotestVersion: String by extra("4.3.2")
 val kotlinVersion: String by extra(project.getKotlinPluginVersion()!!)
 
-repositories {
-    mavenCentral()
-    jcenter()
+allprojects {
+    apply(plugin = "kotlin")
+    apply(plugin = "org.jetbrains.dokka")
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        testImplementation(group = "ch.qos.logback", name = "logback-classic", version = logbackVersion)
+        testImplementation(group = "io.kotest", name = "kotest-runner-junit5-jvm", version = kotestVersion)
+        testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVersion)
+        dokkaHtmlPlugin(group = "org.jetbrains.dokka", name = "kotlin-as-java-plugin", version = kotlinVersion)
+    }
 }
+
+
 
 dependencies {
     api(group = "io.netty", name = "netty-buffer", version = nettyVersion)
-    testImplementation(group = "ch.qos.logback", name = "logback-classic", version = logbackVersion)
-    testImplementation(group = "io.kotest", name = "kotest-runner-junit5-jvm", version = kotestVersion)
-    testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVersion)
-    dokkaHtmlPlugin(group = "org.jetbrains.dokka", name = "kotlin-as-java-plugin", version = kotlinVersion)
 }
 
 kotlin { explicitApi() }
