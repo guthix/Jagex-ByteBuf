@@ -18,3 +18,5 @@ jobs:
         architecture: x64
     - name: Building
       run: ./gradlew build --stacktrace
+    - name: Testing
+      run: ./gradlew test --stacktrace

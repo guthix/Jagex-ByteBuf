@@ -36,33 +36,31 @@ allprojects {
         testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVersion)
         dokkaHtmlPlugin(group = "org.jetbrains.dokka", name = "kotlin-as-java-plugin", version = kotlinVersion)
     }
-}
 
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 
+    tasks {
+        withType<Test> {
+            useJUnitPlatform()
+        }
 
-dependencies {
-    api(group = "io.netty", name = "netty-buffer", version = nettyVersion)
+        compileKotlin {
+            kotlinOptions.jvmTarget = "11"
+        }
+
+        compileTestKotlin {
+            kotlinOptions.jvmTarget = "11"
+        }
+    }
 }
 
 kotlin { explicitApi() }
 
-tasks {
-    withType<Test> {
-        useJUnitPlatform()
-    }
-
-    compileKotlin {
-        kotlinOptions.jvmTarget = "11"
-    }
-
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "11"
-    }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
+dependencies {
+    api(group = "io.netty", name = "netty-buffer", version = nettyVersion)
 }
 
 publishing {

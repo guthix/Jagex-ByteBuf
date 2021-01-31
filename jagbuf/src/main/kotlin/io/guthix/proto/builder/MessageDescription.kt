@@ -15,9 +15,9 @@
  */
 package io.guthix.proto.builder
 
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.*
+import io.netty.buffer.ByteBuf
+import io.netty.channel.ChannelHandlerContext
 import kotlin.script.experimental.annotations.KotlinScript
 
 @KotlinScript(
@@ -25,17 +25,51 @@ import kotlin.script.experimental.annotations.KotlinScript
     compilationConfiguration = Configuration::class
 )
 abstract class MessageDescription {
-    fun message(pkg: String, name: String, build: MessageBuilder.() -> Unit)  {
+    val messages = mutableListOf<String>()
+
+    fun message(pkg: String, name: String, build: MessageBuilder.() -> Unit): FileSpec {
         val messageBuilder = MessageBuilder()
         messageBuilder.build()
+        val className = ClassName(pkg, name)
         val file = FileSpec.builder(pkg, name).apply {
-            addType(TypeSpec.classBuilder(name).apply {
+            indent("    ")
+            addType(TypeSpec.classBuilder(className).apply {
                 primaryConstructor(FunSpec.constructorBuilder().apply {
-                    addParameter("test", String::class)
+                    for(parameter in messageBuilder.properties) {
+                        addParameter(parameter.name, parameter.type)
+                    }
                     build()
+                }.build())
+                for(parameter in messageBuilder.properties) {
+                    addProperty(PropertySpec.builder(parameter.name, parameter.type).apply {
+                        initializer(parameter.name)
+                    }.build())
+                }
+                addFunction(FunSpec.builder("encode").apply {
+                    addParameter("ctx", ChannelHandlerContext::class)
+                    addStatement("val buf = ctx.alloc().buffer()")
+                    for(codec in messageBuilder.codecs) {
+                        addStatement("buf.${codec.encoder(codec.property.name)}")
+                    }
+                    addStatement("return buf")
+                    returns(ByteBuf::class)
+                }.build())
+                addType(TypeSpec.companionObjectBuilder().apply {
+                    addFunction(FunSpec.builder("decode").apply {
+                        addParameter("buf", ByteBuf::class)
+                        for(codec in messageBuilder.codecs) {
+                            addStatement("val ${codec.property.name} = buf.${codec.decoder()}")
+                        }
+                        addStatement("return $name(${messageBuilder.properties.joinToString(", ") { it.name }})")
+                        returns(className)
+                    }.build())
                 }.build())
             }.build())
         }.build()
-        file.writeTo(System.out)
+        val builder = StringBuilder()
+        file.writeTo(builder)
+        val result = builder.toString().removeSuffix("\n")
+        messages.add(result)
+        return file
     }
 }

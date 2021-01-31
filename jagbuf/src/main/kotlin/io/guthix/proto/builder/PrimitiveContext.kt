@@ -29,15 +29,15 @@ enum class Modification(val writeName: String) {
     NEG(writeName = "Neg")
 }
 
-interface Codec
+interface Codec {
+    val property: Property
 
-interface CodecWriter {
-    fun encoder(value: Int): String
+    fun encoder(value: String): String
 
     fun decoder(): String
 }
 
-interface PrimitiveCodec : CodecWriter {
+interface PrimitiveCodec : Codec {
     var signed: Boolean
 }
 
@@ -49,34 +49,45 @@ interface ModifiableCodec : Codec {
     var modification: Modification
 }
 
-class IntCodec : OrderedCodec, PrimitiveCodec {
+class IntCodec(override val property: PrimitiveProperty) : OrderedCodec, PrimitiveCodec {
     override var signed = true
 
     override var order: ByteOrder = ByteOrder.BIG_ENDIAN
 
-    override fun encoder(value: Int): String = "writeInt${order.writeName}($value)"
+    override fun encoder(value: String): String =
+        "${codecName("write", "Int", order = order)}($value)"
 
-    override fun decoder(): String = "writeInt${order.writeName}()"
+    override fun decoder(): String = "${codecName("read", "Int", signed, order = order)}()"
 }
 
-class ShortCodec : OrderedCodec, ModifiableCodec, PrimitiveCodec {
+class ShortCodec(override val property: PrimitiveProperty) : OrderedCodec, ModifiableCodec, PrimitiveCodec {
     override var signed = true
 
     override var order: ByteOrder = ByteOrder.BIG_ENDIAN
 
     override var modification: Modification = Modification.NONE
 
-    override fun encoder(value: Int): String = "writeInt${modification.writeName}${order.writeName}($value)"
+    override fun encoder(value: String): String =
+        "${codecName("write", "Short", modification = modification, order = order)}($value)"
 
-    override fun decoder(): String = "writeInt${modification.writeName}${order.writeName}()"
+    override fun decoder(): String = "${codecName("read", "Short", signed, modification, order)}()"
 }
 
-class ByteCodec : ModifiableCodec, PrimitiveCodec {
+class ByteCodec(override val property: PrimitiveProperty) : ModifiableCodec, PrimitiveCodec {
     override var signed = true
 
     override var modification: Modification = Modification.NONE
 
-    override fun encoder(value: Int): String = "writeInt${modification.writeName}($value)"
+    override fun encoder(value: String): String =
+        "${codecName("write", "Byte", modification = modification)}($value)"
 
-    override fun decoder(): String = "writeInt${modification.writeName}()"
+    override fun decoder(): String = "${codecName("read", "Byte", signed, modification)}()"
 }
+
+private fun codecName(
+    rw: String,
+    type: String,
+    signed: Boolean? = null,
+    modification: Modification? = null,
+    order: ByteOrder? = null
+) = "$rw${if(signed == false) "Unsigned" else ""}$type${modification?.writeName ?: ""}${order?.writeName ?: ""}"
