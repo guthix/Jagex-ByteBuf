@@ -32,6 +32,8 @@ enum class Modification(val writeName: String) {
 interface Codec {
     val property: Property
 
+    fun cast(): String
+
     fun encoder(value: String): String
 
     fun decoder(): String
@@ -54,6 +56,8 @@ class IntCodec(override val property: PrimitiveProperty) : OrderedCodec, Primiti
 
     override var order: ByteOrder = ByteOrder.BIG_ENDIAN
 
+    override fun cast(): String = if(property !is MessageBuilder.IntProperty) ".${property.cast}" else ""
+
     override fun encoder(value: String): String =
         "${codecName("write", "Int", order = order)}($value)"
 
@@ -67,6 +71,8 @@ class ShortCodec(override val property: PrimitiveProperty) : OrderedCodec, Modif
 
     override var modification: Modification = Modification.NONE
 
+    override fun cast(): String = if(property !is MessageBuilder.ShortProperty) ".${property.cast}" else ""
+
     override fun encoder(value: String): String =
         "${codecName("write", "Short", modification = modification, order = order)}($value)"
 
@@ -77,6 +83,8 @@ class ByteCodec(override val property: PrimitiveProperty) : ModifiableCodec, Pri
     override var signed = true
 
     override var modification: Modification = Modification.NONE
+
+    override fun cast(): String = if(property !is MessageBuilder.ByteProperty) ".${property.cast}" else ""
 
     override fun encoder(value: String): String =
         "${codecName("write", "Byte", modification = modification)}($value)"

@@ -58,7 +58,7 @@ abstract class MessageDescription {
                     addFunction(FunSpec.builder("decode").apply {
                         addParameter("buf", ByteBuf::class)
                         for(codec in messageBuilder.codecs) {
-                            addStatement("val ${codec.property.name} = buf.${codec.decoder()}")
+                            addStatement("val ${codec.property.name} = buf.${codec.decoder()}${codec.cast()}")
                         }
                         addStatement("return $name(${messageBuilder.properties.joinToString(", ") { it.name }})")
                         returns(className)

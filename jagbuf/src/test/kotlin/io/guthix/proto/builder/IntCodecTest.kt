@@ -5,9 +5,10 @@ class IntCodecTest : MessageDescriptionTest() {
 
     init {
         "Single property test " {
+            val name = "SingleProperty"
             val generatedFile = object : MessageDescription() {
                 init {
-                    message(pkg = "io.guthix.proto", name = "Foo") {
+                    message(pkg = folder, name = name) {
                         val x by IntProperty()
                         codec {
                             x.asInt()
@@ -15,7 +16,56 @@ class IntCodecTest : MessageDescriptionTest() {
                     }
                 }
             }.messages.first()
-            doTest(generatedFile, "SingleProperty")
+            doTest(generatedFile, name)
+        }
+
+        "Multi property test " {
+            val name = "MultiProperty"
+            val generatedFile = object : MessageDescription() {
+                init {
+                    message(pkg = folder, name = name) {
+                        val x by IntProperty()
+                        val y by IntProperty()
+                        val z by IntProperty()
+                        codec {
+                            x.asInt()
+                            y.asInt()
+                            z.asInt()
+                        }
+                    }
+                }
+            }.messages.first()
+            doTest(generatedFile, name)
+        }
+
+        "Short codec test " {
+            val name = "ShortCodec"
+            val generatedFile = object : MessageDescription() {
+                init {
+                    message(pkg = folder, name = name) {
+                        val x by IntProperty()
+                        codec {
+                            x.asShort()
+                        }
+                    }
+                }
+            }.messages.first()
+            doTest(generatedFile, name)
+        }
+
+        "Byte codec test " {
+            val name = "ByteCodec"
+            val generatedFile = object : MessageDescription() {
+                init {
+                    message(pkg = folder, name = name) {
+                        val x by IntProperty()
+                        codec {
+                            x.asByte()
+                        }
+                    }
+                }
+            }.messages.first()
+            doTest(generatedFile, name)
         }
     }
 

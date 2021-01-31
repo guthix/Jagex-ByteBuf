@@ -14,7 +14,7 @@ class MessageBuilder(
     inner class IntProperty(name: String = "") : PrimitiveProperty(name) {
         override val type: KClass<out Number> = Int::class
 
-        override fun cast(): String = "toInt()"
+        override val cast: String = "toInt()"
 
         operator fun getValue(thisRef: Any?, property: KProperty<*>): IntProperty {
             if(name.isEmpty()) {
@@ -28,7 +28,7 @@ class MessageBuilder(
     inner class ShortProperty(name: String) : PrimitiveProperty(name) {
         override val type: KClass<out Number> = Short::class
 
-        override fun cast(): String = "toShort()"
+        override val cast: String = "toShort()"
 
         operator fun getValue(thisRef: Any?, property: KProperty<*>): ShortProperty {
             if(name.isEmpty()) {
@@ -42,7 +42,7 @@ class MessageBuilder(
     inner class ByteProperty(name: String) : PrimitiveProperty(name) {
         override val type: KClass<out Number> = Byte::class
 
-        override fun cast(): String = "toByte()"
+        override val cast: String = "toByte()"
 
         operator fun getValue(thisRef: Any?, property: KProperty<*>): ByteProperty {
             if(name.isEmpty()) {
