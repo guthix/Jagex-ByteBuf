@@ -17,6 +17,7 @@ package io.guthix.proto.builder
 
 import com.squareup.kotlinpoet.*
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.ByteBufAllocator
 import io.netty.channel.ChannelHandlerContext
 import kotlin.script.experimental.annotations.KotlinScript
 
@@ -46,8 +47,11 @@ abstract class MessageDescription {
                     }.build())
                 }
                 addFunction(FunSpec.builder("encode").apply {
-                    addParameter("ctx", ChannelHandlerContext::class)
-                    addStatement("val buf = ctx.alloc().buffer()")
+                    addParameter(ParameterSpec.builder("alloc", ByteBufAllocator::class)
+                        .defaultValue("ByteBufAllocator.DEFAULT")
+                        .build()
+                    )
+                    addStatement("val buf = alloc.buffer()")
                     for(codec in messageBuilder.codecs) {
                         addStatement("buf.${codec.encoder(codec.property.name)}")
                     }

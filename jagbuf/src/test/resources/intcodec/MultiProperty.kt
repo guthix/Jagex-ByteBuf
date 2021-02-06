@@ -1,7 +1,7 @@
 package intcodec
 
 import io.netty.buffer.ByteBuf
-import io.netty.channel.ChannelHandlerContext
+import io.netty.buffer.ByteBufAllocator
 import kotlin.Int
 
 public class MultiProperty(
@@ -9,8 +9,8 @@ public class MultiProperty(
     public val y: Int,
     public val z: Int
 ) {
-    public fun encode(ctx: ChannelHandlerContext): ByteBuf {
-        val buf = ctx.alloc().buffer()
+    public fun encode(alloc: ByteBufAllocator = ByteBufAllocator.DEFAULT): ByteBuf {
+        val buf = alloc.buffer()
         buf.writeInt(x)
         buf.writeInt(y)
         buf.writeInt(z)
