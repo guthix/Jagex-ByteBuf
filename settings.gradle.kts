@@ -14,5 +14,6 @@ pluginManagement {
 }
 
 include("jagbuf")
+include("jagbuf-gradle")
 
 rootProject.name = "jagex-bytebuf"

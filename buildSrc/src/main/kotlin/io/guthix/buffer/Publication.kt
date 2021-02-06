@@ -35,7 +35,7 @@ fun Project.registerPublication(publicationName: String, pomName: String) {
         }
         publications {
             val publicationProvider = register<MavenPublication>(publicationName) {
-                configurePom(pomName, description, components.getByName("java"))
+                configurePom(pomName, description, components.getByName("kotlin"))
             }
             signPublication(publicationProvider)
         }
