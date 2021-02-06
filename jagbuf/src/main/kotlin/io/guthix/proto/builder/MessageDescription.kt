@@ -18,7 +18,6 @@ package io.guthix.proto.builder
 import com.squareup.kotlinpoet.*
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufAllocator
-import io.netty.channel.ChannelHandlerContext
 import kotlin.script.experimental.annotations.KotlinScript
 
 @KotlinScript(
@@ -26,7 +25,7 @@ import kotlin.script.experimental.annotations.KotlinScript
     compilationConfiguration = Configuration::class
 )
 abstract class MessageDescription {
-    val messages = mutableListOf<String>()
+    val messages = mutableListOf<FileSpec>()
 
     fun message(pkg: String, name: String, build: MessageBuilder.() -> Unit): FileSpec {
         val messageBuilder = MessageBuilder()
@@ -70,10 +69,7 @@ abstract class MessageDescription {
                 }.build())
             }.build())
         }.build()
-        val builder = StringBuilder()
-        file.writeTo(builder)
-        val result = builder.toString().removeSuffix("\n")
-        messages.add(result)
+        messages.add(file)
         return file
     }
 }

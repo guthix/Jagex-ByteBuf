@@ -7,9 +7,11 @@ import java.nio.file.Path
 abstract class MessageDescriptionTest(body: StringSpec.() -> Unit = {}) : StringSpec(body) {
     abstract val folder: String
 
-    fun doTest(generated: String, filename: String) {
+    fun doTest(filename: String, generated: MessageDescription.() -> Unit) {
+        val description = object : MessageDescription() {init { generated() } }
+        val message = description.messages.map { it.toString().removeSuffix("\n") }.first()
         val expectedFile = Path.of(javaClass.getResource("/$folder/$filename.kt").toURI()).toFile()
             .readLines().joinToString("\n")
-        generated shouldBe expectedFile
+        message shouldBe expectedFile
     }
 }
