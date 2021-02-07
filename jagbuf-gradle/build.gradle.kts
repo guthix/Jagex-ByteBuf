@@ -2,10 +2,18 @@ import io.guthix.buffer.registerPublication
 
 plugins {
     id("com.gradle.plugin-publish") version "0.12.0"
+    `kotlin-dsl`
     `java-gradle-plugin`
 }
 
 group = "io.guthix"
+
+dependencies {
+    api(project(":jagbuf"))
+    runtimeOnly(project(":jagbuf"))
+    implementation(gradleApi())
+    implementation(group = "io.github.classgraph", name = "classgraph", version = "4.8.53")
+}
 
 pluginBundle {
     website = "http://www.guthix.io/"
@@ -29,9 +37,3 @@ registerPublication(
     pomName = "jagprot"
 )
 
-dependencies {
-    api(project(":jagbuf"))
-    runtimeOnly(project(":jagbuf"))
-    implementation(gradleApi())
-    implementation(group = "io.github.classgraph", name = "classgraph", version = "4.8.53")
-}
